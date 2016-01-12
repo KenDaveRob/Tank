@@ -1,0 +1,14 @@
+10:BasicEnemy,300;BasicEnemy,360
+100:BasicEnemy,50;BasicEnemy,600
+
+250:BasicEnemy,260;BasicEnemy,340
+270:BasicEnemy,180;BasicEnemy,420
+
+500:Powerup,120;Powerup,480
+520:AimingEnemy,90;AimingEnemy,510
+
+1000:BossEnemy,300;Powerup,500
+
+1400:Powerup,300
+1500:Powerup,700
+1700:Powerup,100

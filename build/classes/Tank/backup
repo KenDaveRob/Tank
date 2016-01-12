@@ -1,0 +1,1722 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package JavaApplication6;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.ImageObserver;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Random;
+
+/**
+ *
+ * @author Kenneth
+ */
+/*
+public abstract class Enemy 
+{
+    
+}*/
+
+public class Enemy implements Observer {
+
+    protected Image img;
+    private int x, y, sizeX, sizeY, speed;
+    private int boom, boomTime, count;
+    private Random gen;
+    private boolean show;
+    //protected JavaApplication6 workingApplet;
+    private java.util.List<Player> players;
+    private java.util.List<Explosion> explosions;
+
+    Enemy(Image img, java.util.List<Player> players, java.util.List<Explosion> explosions, int speed, Random gen) {
+        this.img = img;
+        this.players = players;
+        this.explosions = explosions;
+        this.x = Math.abs(gen.nextInt() % (600 - 30));
+        this.y = -100;
+        this.speed = speed;
+        this.gen = gen;
+        this.show = true;
+        sizeX = img.getWidth(null);
+        sizeY = img.getHeight(null);
+        boom = 0;
+        System.out.println("w:" + sizeX + " y:" + sizeY);
+    }
+
+    public Enemy(Image img, java.util.List<Player> players, java.util.List<Explosion> explosions, int speed, int x, int y) {
+        this.img = img;
+        this.players = players;
+        this.explosions = explosions;
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.show = true;
+        boom = 0;
+        sizeX = img.getWidth(null);
+        sizeY = img.getHeight(null);
+    }
+
+    public Enemy(int x, int y, int speed) {
+        this.x = x;
+        this.y = y;
+        this.speed = 1;
+        boom = 0;
+        this.show = false;
+    }
+
+    public void setImg(Image img) {
+        this.img = img;
+        sizeX = img.getWidth(null);
+        sizeY = img.getHeight(null);
+        this.show = true;
+    }
+    /*
+    public void setWorkingApplet(JavaApplication6 workingApplet) {
+        this.workingApplet = workingApplet;
+    }
+
+    public void setImageAndApplet(JavaApplication6 workingApplet) {
+        this.setWorkingApplet(workingApplet);
+        this.setImg(workingApplet.getSprite("Resources/enemy1_1.png"));
+    }*/
+    
+    public void setImageAndPlayer(Image img, java.util.List<Player> players)
+    {
+        this.players = players;
+        this.img = img;
+    }
+    
+    
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+    
+    public boolean isShown()
+    {
+        return this.show;
+    }
+
+    public void tick(int w, int h, GameEvents gameEvents) throws NullPointerException {
+        if (players == null || img == null) {
+            throw new NullPointerException("Enemy update() called but players == null || img == null.");
+        }
+        y += speed;
+        for(Player currentPlayer : players)
+        {
+            if (currentPlayer.collision(x, y, sizeX, sizeY)) {
+                show = false;
+                //System.out.println("Explosion");
+                gameEvents.setValue("Explosion Large");
+            }
+        }
+    }
+
+    public void draw(Graphics g, ImageObserver obs) {
+        if (show) {
+            g.drawImage(img, x, y, obs);
+        }
+        
+            if(count == boomTime){
+                boom = 0;
+                count = 0;
+            } else count++;
+            //this.obs = obs; 
+    }
+    
+    public boolean collision(int x, int y, int w, int h) {
+        if ((y + h > this.y) && (y < this.y + img.getHeight(null))) { // very simple test for showing an idea -- this only checks y forwarding direction
+            if ((x + w > this.x) && (x < this.x + img.getWidth(null))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+
+    @Override
+    public void update(Observable o, Object arg) {
+        GameEvents ge = (GameEvents) arg;
+        if (ge.type == 4) {
+            if (this == (Enemy) ge.event) 
+            {
+                if(boom == 0) 
+                    {
+                        this.show = false;
+                        this.boomTime = 5*7*1  + 1;
+                        explosions.add(new Explosion(this.workingApplet, this.x, this.y, 2, 5, 7, 1));
+                        this.workingApplet.addExplosion();
+                        System.out.println("added explosion inside enemy");
+                    }
+                 boom = 1;
+            }
+        }
+    }
+}
+
+
+
+public class Enemy implements Observer {
+
+    protected Image img;
+    private int x, y, sizeX, sizeY, speed;
+    private int boom, boomTime, count;
+    private Random gen;
+    private boolean show;
+    protected JavaApplication6 workingApplet;
+
+    Enemy(JavaApplication6 workingApplet, int speed, Random gen) {
+        this.workingApplet = workingApplet;
+        this.img = workingApplet.getSprite("Resources/enemy1_1.png");
+        this.x = Math.abs(gen.nextInt() % (600 - 30));
+        this.y = -100;
+        this.speed = speed;
+        this.gen = gen;
+        this.show = true;
+        sizeX = img.getWidth(null);
+        sizeY = img.getHeight(null);
+        boom = 0;
+        System.out.println("w:" + sizeX + " y:" + sizeY);
+    }
+
+    public Enemy(JavaApplication6 workingApplet, int speed, int x, int y) {
+        this.workingApplet = workingApplet;
+        this.img = workingApplet.getSprite("Resources/enemy1_1.png");
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.show = true;
+        boom = 0;
+        sizeX = img.getWidth(null);
+        sizeY = img.getHeight(null);
+    }
+
+    public Enemy(int x, int y, int speed) {
+        this.x = x;
+        this.y = y;
+        this.speed = 1;
+        boom = 0;
+        this.show = false;
+    }
+
+    public void setImg(Image img) {
+        this.img = img;
+        sizeX = img.getWidth(null);
+        sizeY = img.getHeight(null);
+        this.show = true;
+    }
+
+    public void setWorkingApplet(JavaApplication6 workingApplet) {
+        this.workingApplet = workingApplet;
+    }
+
+    public void setImageAndApplet(JavaApplication6 workingApplet) {
+        this.setWorkingApplet(workingApplet);
+        this.setImg(workingApplet.getSprite("Resources/enemy1_1.png"));
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+    
+    public boolean isShown()
+    {
+        return this.show;
+    }
+
+    public void tick(int w, int h) throws NullPointerException {
+        if (workingApplet == null) {
+            throw new NullPointerException("Enemy update() called but no workingApplet assigned.");
+        }
+        y += speed;
+        if (workingApplet.playerOne.collision(x, y, sizeX, sizeY)) {
+            show = false;
+            //System.out.println("Explosion");
+            workingApplet.gameEvents.setValue("Explosion Large");
+        }
+    }
+
+    public void draw(Graphics g, ImageObserver obs) {
+        if (show) {
+            g.drawImage(img, x, y, obs);
+        }
+        
+            if(count == boomTime){
+                boom = 0;
+                count = 0;
+            } else count++;
+            //this.obs = obs; 
+    }
+    
+    public boolean collision(int x, int y, int w, int h) {
+        if ((y + h > this.y) && (y < this.y + img.getHeight(null))) { // very simple test for showing an idea -- this only checks y forwarding direction
+            if ((x + w > this.x) && (x < this.x + img.getWidth(null))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+
+    @Override
+    public void update(Observable o, Object arg) {
+        GameEvents ge = (GameEvents) arg;
+        if (ge.type == 4) {
+            if (this == (Enemy) ge.event) 
+            {
+                if(boom == 0) 
+                    {
+                        this.show = false;
+                        this.boomTime = 5*7*1  + 1;
+                        this.workingApplet.addExplosion(new Explosion(this.workingApplet, this.x, this.y, 2, 5, 7, 1));
+                        System.out.println("added explosion inside enemy");
+                    }
+                 boom = 1;
+            }
+        }
+    }
+}
+
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package JavaApplication6;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.image.ImageObserver;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JApplet;
+
+
+
+/**
+ *
+ * @author Kenneth
+ */
+
+class MovementKeys {
+
+    private int up;
+    private int down;
+    private int left;
+    private int right;
+
+    public MovementKeys(int up, int down, int left, int right) {
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+    }
+
+    public int getUp() {
+        return up;
+    }
+
+    public void setUp(int up) {
+        this.up = up;
+    }
+
+    public int getDown() {
+        return down;
+    }
+
+    public void setDown(int down) {
+        this.down = down;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public void setLeft(int left) {
+        this.left = left;
+    }
+
+    public int getRight() {
+        return right;
+    }
+
+    public void setRight(int right) {
+        this.right = right;
+    }
+
+    
+}
+
+public class Player implements Observer {
+        protected Image img;
+        
+        protected int x, y, speed;
+        protected int boom, explosionCounter;
+        protected int boomTime;
+        protected ImageObserver obs;
+        protected int movingX;
+        protected int movingY;
+        protected MovementKeys motionKeys;
+        protected char fireKey;
+        protected javax.swing.JApplet workingApplet; //Note because this is JApplet workingApplet must be cast to the correct game applet class when used
+        protected int bulletSpeed;
+        protected int index;
+        protected double angle;
+        protected int fireRefractoryPeriod;
+        protected int fireCounter;
+        protected int health;
+        protected int lives;
+        protected boolean isDestroyed;
+        
+
+        Player(Image img, int index, int x, int y, int speed, int lives, MovementKeys motionKeys, char fireKey, JApplet workingApplet) {
+            this.index = index;
+            this.workingApplet = workingApplet;
+            this.img = img;
+            this.x = x;
+            this.y = y;
+            this.speed = speed;
+            this.health = 100;
+            bulletSpeed = -1;
+            boom = 0;
+            movingX = 0;
+            movingY = 0;
+            this.motionKeys = motionKeys;
+            this.fireKey = fireKey;
+            this.fireRefractoryPeriod = 2;
+            this.explosionCounter = 0;
+            this.fireCounter = 0;
+            this.isDestroyed = false;
+        }
+
+        public void draw(Graphics g, ImageObserver obs) {
+            /*
+            if(boom == 0)
+                g.drawImage(img, x, y, obs);
+            else if(count == 10){
+                boom = 0;
+                count = 0;
+            } else count++;
+            this.obs = obs; */
+
+            
+            g.drawImage(img, x, y, obs);
+            if(explosionCounter == boomTime){
+                boom = 0;
+                explosionCounter = 0;
+            } else explosionCounter++;
+            
+            this.fireCounter++;
+            this.obs = obs; 
+            
+        }
+
+    public int getBulletSpeed() {
+        return bulletSpeed;
+    }
+
+    public void setBulletSpeed(int bulletSpeed) {
+        this.bulletSpeed = bulletSpeed;
+    }
+        
+        
+        
+        public boolean collision(int x, int y, int w, int h) 
+        {                      
+            
+            if((y+h > this.y) &&(y < this.y + img.getHeight(this.obs) )) { // very simple test for showing an idea -- this only checks y forwarding direction
+                if((x+w > this.x) &&(x < this.x + img.getWidth(this.obs) )) {
+                   return true;
+                }
+            }
+            return false;
+        }
+        
+        public void tick()
+        {
+            if(health <= 0) this.blowUp();
+            x += speed*movingX;
+            y += speed*movingY;
+        }
+      
+        public void update(Observable obj, Object arg)
+        {
+            GameEvents ge = (GameEvents) arg;
+            if(ge.type == 1) {
+                KeyEvent e = (KeyEvent) ge.event;
+                
+                if(e.getKeyCode() == this.motionKeys.getLeft())
+                    movingX = -1;
+                else if(e.getKeyCode() == this.motionKeys.getRight())
+                    movingX = +1;
+                else if(e.getKeyCode() == this.motionKeys.getUp())
+                    movingY = -1;
+                else if(e.getKeyCode() == this.motionKeys.getDown())
+                    movingY = +1;
+                
+                if(e.getKeyChar() == this.fireKey)
+                {
+                    if(this.fireCounter > this.fireRefractoryPeriod)
+                    {
+                        ((JavaApplication6)this.workingApplet).addBullet(this.x+(this.img.getWidth(null)/4), this.y-8, 0, this.bulletSpeed, 2);
+                        System.out.println("Fire"); 
+                        this.fireCounter = 0;
+                    }
+                }
+
+            }
+            else if(ge.type == 2) {
+                String msg = (String)ge.event;
+                
+                if(msg.equals("ExplosionLarge "+this.index)) {
+                    if(boom == 0) 
+                    {
+                        if(!Enemy.class.isInstance(ge.cause) || ge.cause == null)
+                            System.out.println("Error: inside player.update(), gameEvent.cause does not exist or is not an enemy");
+                        else
+                        {
+                            int explosionX = ((Enemy)ge.cause).getX();
+                            int explosionY = ((Enemy)ge.cause).getY();
+                            
+                            health -= ((JavaApplication6)this.workingApplet).damageFromRamming;
+                            
+                            this.boomTime = 5*7*1  + 1;
+                            ((JavaApplication6)this.workingApplet).addExplosion(new Explosion(this.workingApplet, explosionX, explosionY, 2, 5, 7, 1));
+                            System.out.println("added explosion");
+                        }
+                    }
+                    boom = 1;
+                    //                              workingApplet, int x, int y, int explosionType, int rate, int frameMax, int cycleNumber
+                    
+                    //System.out.println("Explosion");
+                }
+                
+                if(msg.equals("ExplosionSmall "+this.index))
+                {
+                    if(ge.cause.getClass() != Bullet.class || ge.cause == null)
+                        System.out.println("Error: inside player.update(), gameEvent.cause does not exist or is not a bullet.");
+                    else
+                    {
+                        //The idea here is to make it look like the explosion is occuring right where the contact between the bullet and plane is.
+                        int explosionX = ((Bullet)ge.cause).getX() + (Bullet.smallImg.getWidth(null)/4);
+                        int explosionY = ((Bullet)ge.cause).getY() + (Bullet.smallImg.getWidth(null)/2)+this.img.getHeight(null)/10;
+                        this.health -= Bullet.bulletStrengthArray.get(0);
+                        //Explosion(JApplet workingApplet, int x, int y, int explosionType, int rate, int frameMax, int cycleNumber
+
+                        ((JavaApplication6)this.workingApplet).addExplosion(new Explosion(this.workingApplet, explosionX, explosionY, 1, 5, 6, 1));
+                        System.out.println("added small explosion inside player "+this.index);
+                    }
+                }
+            }
+            
+            else if(ge.type == 3)
+            {
+                KeyEvent e = (KeyEvent) ge.event;
+                if (e.getKeyCode() == this.motionKeys.getLeft() || e.getKeyCode() == this.motionKeys.getRight()) 
+                    movingX = 0;
+                if (e.getKeyCode() == this.motionKeys.getUp() || e.getKeyCode() == this.motionKeys.getDown()) 
+                    movingY = 0;
+            }
+        }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setFireRefractoryPeriod(int fireRefractoryPeriod) {
+        this.fireRefractoryPeriod = fireRefractoryPeriod;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+    
+    private void blowUp()
+    {
+        if(this.lives > 0)
+        {
+            this.lives--;
+            this.health = 100;
+            
+                        
+        }
+        else
+            isDestroyed = true;
+    }
+    
+    
+    
+    
+    
+    public void setVelocity(int xStep, int yStep)
+    {
+        this.movingX = xStep;
+        this.movingY = yStep;
+    }
+
+    public Image getImg() {
+        return img;
+    }
+
+    public ImageObserver getObs() {
+        return obs;
+    }
+        
+        
+    }
+
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package JavaApplication6;
+
+/**
+ *
+ * @author Kenneth
+ */
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.*;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
+/**
+ *
+ * @author Ilmi
+ */
+public class JavaApplication6 extends JApplet implements Runnable {
+
+    private static final JavaApplication6 demo = new JavaApplication6();
+    private Thread thread; 
+   
+    private int x = 0, move = 0;
+    private BufferedImage bimg;
+    int speed = 1, score = 0;
+    Random generator = new Random(1234567);
+    Island I1, I2, I3;
+    private ArrayList<Player> players;
+    Player playerOne;
+    Player playerTwo;
+    Image lifeImage;
+    Image gameOverImage;
+    //Enemy e1;
+    private java.util.List<Enemy> enemies;
+    private java.util.List<Powerup> powerups;
+    private java.util.List<Bullet> bullets;
+    private java.util.List<Explosion> explosions;
+    private int frameCounter;
+    private static SpawnSequence scenario;
+    private static final int WIDTH = 640;
+    private static final int HEIGHT = 480;
+    Soundtrack soundtrack;
+    Thread soundthread;
+    int damageFromRamming;
+    GameEvents gameEvents;
+    //Explosion testE;
+
+    boolean gameOver;
+    ImageObserver observer;
+
+    public void init() {
+        setFocusable(true);
+        setBackground(Color.white);
+        Image myPlane, island1, island2, island3, enemy;
+        
+        frameCounter = 0;
+        damageFromRamming = 10;
+        
+        lifeImage = getSprite("Resources/life.png");   
+        gameOverImage = getSprite("Resources/gameOver.png");
+        island1 = getSprite("Resources/island1.png");
+        island2 = getSprite("Resources/island2.png");
+        island3 = getSprite("Resources/island3.png");
+        myPlane = getSprite("Resources/myplane_1.png");
+        Bullet.largeImg = getSprite("Resources/bullet.png");
+        Bullet.smallImg = getSprite("Resources/enemybullet1.png");
+        Bullet.largeLeftImg = getSprite("Resources/bulletLeft.png");
+        Bullet.largeRightImg = getSprite("Resources/bulletRight.png");
+        Bullet.bulletStrengthArray = new ArrayList<Integer>();
+        Bullet.bulletStrengthArray.add(0, 5);
+        Bullet.bulletStrengthArray.add(1, 10);
+ 
+        gameOver = false;
+        observer = this;
+        
+        players = new ArrayList<Player>();
+        I1 = new Island(island1, 100, 100, speed, generator);
+        I2 = new Island(island2, 200, 400, speed, generator);
+        I3 = new Island(island3, 300, 200, speed, generator);
+        enemies = new LinkedList<Enemy>();
+        powerups = new LinkedList<Powerup>();
+        bullets = new LinkedList<Bullet>();
+        explosions = new LinkedList<Explosion>();
+        scenario = new SpawnSequence(this);
+        try {
+            scenario.loadSequence(new java.io.File("C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\myScenario.txt"));
+            //e1 = new Enemy(this, 50, -50);
+            //e1 = new Enemy(this, 50, -50);
+        } catch (Exception ex) {
+            System.out.println("Exception found inside" + this.getClass().getName() + ".init()...");
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
+        
+        //testE = new Explosion(this, 30, 30, 1, 5, 6, 3);
+        
+        KeyControl key = new KeyControl();
+        addKeyListener(key);
+        gameEvents = new GameEvents();
+        playerOne = new Player(myPlane, 1, 300, 260, 10, 1, new MovementKeys(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT), '\n', this);
+        playerTwo = new Player(myPlane, 2, 200, 260, 10, 1, new MovementKeys(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D), ' ', this);
+        playerOne.setFireRefractoryPeriod(12);
+        playerTwo.setFireRefractoryPeriod(12);
+        players.add(playerOne);
+        players.add(playerTwo);
+        gameEvents.addObserver(playerOne);
+        gameEvents.addObserver(playerTwo);
+        soundtrack = new Soundtrack();
+        soundthread = new Thread(soundtrack);
+        soundthread.start();
+        
+    }
+   
+
+    public java.util.List<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public java.util.List<Bullet> getBullets() {
+        return bullets;
+    }
+
+    public java.util.List<Explosion> getExplosions() {
+        return explosions;
+    }
+
+    public GameEvents getGameEvents() {
+        return gameEvents;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+    
+    
+    
+    
+
+    public class Island {
+
+        Image img;
+        int x, y, speed;
+        Random gen;
+
+        Island(Image img, int x, int y, int speed, Random gen) {
+            this.img = img;
+            this.x = x;
+            this.y = y;
+            this.speed = speed;
+            this.gen = gen;
+        }
+
+        public void update(int w, int h) {
+            y += speed;
+            if (y >= h) {
+                y = -100;
+                x = Math.abs(gen.nextInt() % (w - 30));
+            }
+        }
+
+        public void draw(Graphics g, ImageObserver obs) {
+            g.drawImage(img, x, y, obs);
+        }
+    }
+    
+
+    public class KeyControl extends KeyAdapter {
+
+        public void keyPressed(KeyEvent e) {
+            gameEvents.setValue(e);
+        }
+
+        //Using Released may make the plane more responsive
+        public void keyReleased(KeyEvent e) {
+            gameEvents.setValueReleased(e);
+        }
+    }
+   
+    /*
+    public boolean collision(int x, int y, int w, int h) {
+     
+        if ((y + h > m.getY()) && (y < m.getY() + m.getImg().getHeight(m.getObs()))) { // very simple test for showing an idea -- this only checks y forwarding direction
+            if ((x + w > m.getX()) && (x < m.getX() + m.getImg().getWidth(m.getObs()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    */
+   
+    
+    
+    
+    public Image getSprite(String name) {
+        URL url = JavaApplication6.class.getResource(name);
+        Image img = getToolkit().getImage(url);
+        try {
+            MediaTracker tracker = new MediaTracker(this);
+            tracker.addImage(img, 0);
+            tracker.waitForID(0);
+        } catch (Exception e) {
+        }
+        return img;
+    }
+
+    // generates a new color with the specified hue
+    public void drawBackGroundWithTileImage(int w, int h, Graphics2D g2) {
+        Image sea;
+        sea = getSprite("Resources/water.png");
+        int TileWidth = sea.getWidth(this);
+        int TileHeight = sea.getHeight(this);
+
+        int NumberX = (int) (w / TileWidth);
+        int NumberY = (int) (h / TileHeight);
+
+        Image Buffer = createImage(NumberX * TileWidth, NumberY * TileHeight);
+        //Graphics BufferG = Buffer.getGraphics();
+
+
+        for (int i = -1; i <= NumberY; i++) {
+            for (int j = 0; j <= NumberX; j++) {
+                g2.drawImage(sea, j * TileWidth, i * TileHeight + (move % TileHeight), TileWidth, TileHeight, this);
+            }
+        }
+        move += speed;
+    }
+
+    public void drawDemo(int w, int h, Graphics2D g2) {
+
+        
+        if (!gameOver) {
+            //if(this.frameCounter % 2 == 0) need 19 more seconds
+            drawBackGroundWithTileImage(w, h, g2);
+            I1.update(w, h);
+            I1.draw(g2, this);
+
+            I2.update(w, h);
+            I2.draw(g2, this);
+
+            I3.update(w, h);
+            I3.draw(g2, this);
+
+            if(!playerOne.isDestroyed)
+            {
+                playerOne.tick();
+                playerOne.draw(g2, this);
+            }
+            
+            if(!playerTwo.isDestroyed)
+            {
+                playerTwo.tick();
+                playerTwo.draw(g2, this);
+            }
+            
+            updateAndDrawBullets(w, h, g2);
+            clearOldBullets();
+            
+            generateEnemies();
+            updateAndDrawEnemies(w, h, g2);
+            clearOldEnemies();
+            
+            updateAndDrawPowerups(w, h, g2);
+            
+            //e1.update(w, h);
+            //e1.draw(g2, this);
+            
+            //testE.incrementAnimation();
+            //testE.draw(g2, this);
+            processExplosions(g2);
+            
+            drawHealthAndLives(g2);
+            
+            this.frameCounter++;
+            if(playerOne.isDestroyed && playerTwo.isDestroyed) this.gameOver = true;
+        }
+        else  
+        {
+            drawBackGroundWithTileImage(w, h, g2);
+            //PRINT SCORE AND GAMEOVER
+            g2.drawImage(this.gameOverImage, (this.getWidth()/2)-(this.gameOverImage.getWidth(null)/2), (this.getHeight()/2)-(this.gameOverImage.getHeight(null)/2), this);
+            g2.setColor(Color.BLACK);
+            g2.setFont(new Font(g2.getFont().getName(), Font.BOLD, 50));
+            g2.drawString("Score: "+this.score, (this.getWidth()/2)-100, (this.getHeight()/2)-50);
+        }
+  
+    }
+    
+    private void drawHealthAndLives(Graphics2D g2)
+    {
+        int playerOneHealth = this.playerOne.getHealth();
+        int playerTwoHealth = this.playerTwo.getHealth();
+        int playerOneLives = this.playerOne.getLives();
+        int playerTwoLives = this.playerTwo.getLives();
+        //int index;
+        g2.setColor(Color.green);
+        g2.fillRect(JavaApplication6.WIDTH-playerOneHealth, 0, playerOneHealth, 10);
+        g2.fillRect(0, 0, playerTwoHealth, 10);
+        
+        //g2.setColor(Color.black);
+        g2.drawString("Player Two", 0, 15+lifeImage.getHeight(null));
+        g2.drawString("Joint Score: "+this.score, 0, 30+lifeImage.getHeight(null));
+        g2.drawString("Player One", JavaApplication6.WIDTH-68, 15+lifeImage.getHeight(null));
+        
+        for(int i = 1; i < playerOneLives+1; i++)
+            g2.drawImage(lifeImage, JavaApplication6.WIDTH-i*lifeImage.getWidth(null), 10, this);
+        
+        
+        
+        for(int i = 0; i < playerTwoLives; i++)
+            g2.drawImage(lifeImage, i*lifeImage.getWidth(null), 10, this);
+    }
+    public void addExplosion(Explosion newExplosion)
+    {
+        this.explosions.add(newExplosion);
+    }
+    
+    public void addBullet(int x, int y, int xStep, int yStep, int strength)
+    {
+        this.bullets.add(new Bullet(players, enemies, gameEvents, x, y, xStep, yStep, strength));
+    }
+    
+    public void addBullet(int x, int y, int xStep, int yStep, int strength, int angle)
+    {
+        this.bullets.add(new Bullet(players, enemies, gameEvents, x, y, xStep, yStep, strength, angle));
+    }
+    
+    private void processExplosions(Graphics2D g2)
+    {
+        Explosion explosionIndex;
+        Iterator<Explosion> enemiesIterator = this.explosions.iterator();
+        while(enemiesIterator.hasNext())
+        {
+            explosionIndex = enemiesIterator.next();
+            if(!explosionIndex.show)
+                enemiesIterator.remove();
+            
+            else
+            {
+                explosionIndex.incrementAnimation();
+                explosionIndex.draw(g2, this);
+            }
+        }
+    }
+    
+    private void updateAndDrawEnemies(int w, int h, Graphics2D g2)
+    {
+        for(Enemy enemyIndex : this.enemies)
+        {
+            enemyIndex.tick(w, h, this.gameEvents);
+            enemyIndex.draw(g2, this);
+        }
+    }
+    
+    private void updateAndDrawPowerups(int w, int h, Graphics2D g2)
+    {
+        for(Powerup powerupIndex : this.powerups)
+        {
+            powerupIndex.tick(w, h, this.gameEvents);
+            powerupIndex.draw(g2, this);
+        }
+    }
+    
+    private void updateAndDrawBullets(int w, int h, Graphics2D g2)
+    {
+        for(Bullet bulletIndex : this.bullets)
+        {
+            bulletIndex.tick(w, h);
+            bulletIndex.draw(g2, this);
+        }
+    }
+    
+    
+    
+    private void generateEnemies()
+    {
+        SpawnEvent currentSpawnEvent = this.scenario.getSpawnEvent(this.frameCounter);
+        
+        if(currentSpawnEvent != null)
+        {
+            for(Spawnable newSpawn : currentSpawnEvent.getEnemies())
+            {
+                //newEnemy.setWorkingApplet(this);
+                
+                //This is a very poor way to load the images,
+                //however I had a great deal of trouble trying to load the images into there class instances inside the SpawnSequence.loadSequence() method
+                if(Enemy.class.isInstance(newSpawn))
+                {
+                    Enemy newEnemy = (Enemy)newSpawn;
+                    if(newEnemy.getClass() == BasicEnemy.class)
+                        newEnemy.setImageAndApplet(this, getSprite("Resources/enemy1_1.png"));
+                    else if(newEnemy.getClass() == AimingEnemy.class)
+                        newEnemy.setImageAndApplet(this, getSprite("Resources/enemy2_1.png"));
+                    else if(newEnemy.getClass() == BossEnemy.class)
+                    {
+                        newEnemy.setImageAndApplet(this, getSprite("Resources/myboss_1.png"));
+                        ((BossEnemy)newEnemy).setCenter();
+                    }
+                    gameEvents.addObserver(newEnemy);
+                    this.enemies.add(newEnemy);
+                }
+                else if(Powerup.class.isInstance(newSpawn))
+                {
+                    System.out.println("Spawned powerup");
+                    this.powerups.add((Powerup)newSpawn);
+                }
+            }
+            
+        }
+    }
+
+    private void clearOldEnemies()
+    {
+        Iterator<Enemy> enemiesIterator = this.enemies.iterator();
+        while(enemiesIterator.hasNext())
+        {
+            BasicEnemy currentEnemy = (BasicEnemy)enemiesIterator.next();
+            if(currentEnemy.getY() > JavaApplication6.HEIGHT)
+                enemiesIterator.remove();
+            
+            else if(!currentEnemy.isShown())
+                enemiesIterator.remove();
+        }
+    }
+    
+    private void clearOldBullets()
+    {
+        Iterator<Bullet> bulletIterator = this.bullets.iterator();
+        while(bulletIterator.hasNext())
+        {
+            Bullet currentBullet = bulletIterator.next();
+            if(currentBullet.getY() > JavaApplication6.HEIGHT || currentBullet.getY() < 0 ||
+                    currentBullet.getX() > JavaApplication6.WIDTH || currentBullet.getX() < 0)
+                bulletIterator.remove();
+            
+            else if(!currentBullet.isShown())
+                bulletIterator.remove();
+        }
+    }
+
+    public Graphics2D createGraphics2D(int w, int h) {
+        Graphics2D g2 = null;
+        if (bimg == null || bimg.getWidth() != w || bimg.getHeight() != h) {
+            bimg = (BufferedImage) createImage(w, h);
+        }
+        g2 = bimg.createGraphics();
+        g2.setBackground(getBackground());
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY);
+        g2.clearRect(0, 0, w, h);
+        return g2;
+    }
+
+    public void paint(Graphics g) {
+        Dimension d = getSize();
+        Graphics2D g2 = createGraphics2D(d.width, d.height);
+        drawDemo(d.width, d.height, g2);
+        g2.dispose();
+        g.drawImage(bimg, 0, 0, this);
+    }
+
+    public void start() {
+        thread = new Thread(this);
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.start();
+    }
+
+    public void run() {
+    	
+        Thread me = Thread.currentThread();
+        while (thread == me) {
+            repaint();
+          
+          try {
+                thread.sleep(25);
+            } catch (InterruptedException e) {
+                break;
+            }
+            
+        }
+    	    	
+       // thread = null;
+    }
+    
+    /*
+    void playSound(String filename, int back) 
+    {
+            
+    }*/
+    
+    /* OTHER SOUND RESOURCES
+     * http://www.anyexample.com/programming/java/java_play_wav_sound_file.xml
+     * http://stackoverflow.com/questions/8425481/play-wav-file-from-jar-as-resource-using-java
+     * see http://www.cs.cmu.edu/~illah/CLASSDOCS/javasound.pdf
+     */
+    void playSound(String filename)
+    {
+        try {
+            AudioPlayer.player.start(new AudioStream(getClass().getResourceAsStream(filename)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
+    }
+    /*
+    void playBackround()
+    {
+        //(new Soundtrack()).start();
+        
+        try {
+            
+            AudioPlayer.player.start(new AudioStream(getClass().getResourceAsStream("Resources/background2.wav")));
+            //AudioPlayer.player.wait(69);
+            //AudioPlayer.player.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
+               
+    }*/
+
+    public static void main(String argv[]) {
+        
+        demo.init();
+        //demo.setFocusable(true);
+        javax.swing.JMenu fileMenu;
+        javax.swing.JMenu optionsMenu;
+        javax.swing.JMenuBar menuBar;
+        javax.swing.JMenuItem pauseMenuItem;
+        javax.swing.JMenuItem killSoundtrackMenuItem;
+        javax.swing.JMenuItem openScenarioMenuItem;
+        
+        menuBar = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        pauseMenuItem = new javax.swing.JMenuItem();
+        killSoundtrackMenuItem = new javax.swing.JMenuItem();
+        openScenarioMenuItem = new javax.swing.JMenuItem();
+        optionsMenu = new javax.swing.JMenu();
+        JFrame f;
+
+        fileMenu.setText("File");
+
+        pauseMenuItem.setText("Pause");
+        killSoundtrackMenuItem.setText("Please god stop the sound!");
+        openScenarioMenuItem.setText("Open Scenario");
+        pauseMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pauseActionPerformed(evt);
+            }
+        });
+        killSoundtrackMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                killSoundActionPerformed(evt);
+            }
+        });
+        
+        openScenarioMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openActionPerformed(evt);
+            }
+        });
+                
+        fileMenu.add(pauseMenuItem);
+        fileMenu.add(killSoundtrackMenuItem);
+
+        optionsMenu.add(openScenarioMenuItem);
+        menuBar.add(fileMenu);
+
+        optionsMenu.setText("Options");
+        menuBar.add(optionsMenu);
+
+
+        
+        f = new JFrame("Scrolling Shooter");
+        
+        f.setJMenuBar(menuBar);
+        f.addWindowListener(new WindowAdapter() {});
+        f.getContentPane().add("Center", demo);
+        f.pack();
+        f.setSize(new Dimension(WIDTH, HEIGHT));
+        f.setVisible(true);
+        f.setResizable(false);
+        demo.start();
+    }
+    
+    private static void pauseActionPerformed(java.awt.event.ActionEvent evt) {                                     
+        System.out.println("pause");
+        demo.thread = null;
+    }      
+    
+    private static void killSoundActionPerformed(java.awt.event.ActionEvent evt) {   
+        //if(demo.soundtrack.isContinueLooping())
+        {
+            demo.soundtrack.setContinueLooping(false);
+            //JavaApplication6.killSoundtrackMenuItem.setText("Please turn on that wonderfull noise, It's positively orgasmic.");
+        }
+        /*
+        if(!demo.soundtrack.isContinueLooping())
+        {
+            demo.soundtrack.setContinueLooping(true);
+            JavaApplication6.killSoundtrackMenuItem.setText("Please god stop the sound!");
+        }*/        
+    }   
+    
+    private static void openActionPerformed(java.awt.event.ActionEvent evt) {   
+        /*final JFileChooser fc = new JFileChooser();
+//In response to a button click:
+int returnVal = fc.showOpenDialog(this);*/
+   
+    } 
+
+    /**
+     * This method is called from within the init() method to initialize the
+     * form. WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        jFileChooser1 = new javax.swing.JFileChooser();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+
+        getContentPane().add(jFileChooser1, java.awt.BorderLayout.LINE_END);
+
+        jMenu1.setText("File");
+
+        jMenuItem1.setText("jMenuItem1");
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+    }// </editor-fold>                        
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    // End of variables declaration                   
+}
+
+
+
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Tank;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.image.ImageObserver;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JApplet;
+
+
+
+/**
+ *
+ * @author Kenneth
+ */
+
+class MovementKeys {
+
+    private int up;
+    private int down;
+    private int left;
+    private int right;
+
+    public MovementKeys(int up, int down, int left, int right) {
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+    }
+
+    public int getUp() {
+        return up;
+    }
+
+    public void setUp(int up) {
+        this.up = up;
+    }
+
+    public int getDown() {
+        return down;
+    }
+
+    public void setDown(int down) {
+        this.down = down;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public void setLeft(int left) {
+        this.left = left;
+    }
+
+    public int getRight() {
+        return right;
+    }
+
+    public void setRight(int right) {
+        this.right = right;
+    }
+
+    
+}
+
+
+public class Player implements Observer {
+        protected Image img;
+        protected int x, y, speed;
+        protected int spawnX, spawnY;
+        protected int boom, explosionCounter;
+        protected int boomTime;
+        protected ImageObserver obs;
+        protected int movingX;
+        protected int movingY;
+        protected MovementKeys motionKeys;
+        protected char fireKey;
+        protected javax.swing.JApplet workingApplet;
+        protected int bulletSpeed;
+        protected int index;
+        protected int fireRefractoryPeriod;
+        protected int fireCounter;
+        protected int health;
+        protected int lives;
+        protected boolean isDestroyed;
+        protected int destructionCounter, destructionPause;
+        protected int powerupCounter;
+        protected int hasPowerup;
+        
+
+        Player(Image img, int index, int x, int y, int speed, int lives, MovementKeys motionKeys, char fireKey, JApplet workingApplet) {
+            this.index = index;
+            this.workingApplet = workingApplet;
+            this.img = img;
+            this.x = x;
+            this.spawnX = x;
+            this.y = y;
+            this.spawnY = y;
+            this.speed = speed;
+            this.health = 100;
+            bulletSpeed = -1;
+            boom = 0;
+            movingX = 0;
+            movingY = 0;
+            this.motionKeys = motionKeys;
+            this.fireKey = fireKey;
+            this.lives = lives;
+            this.fireRefractoryPeriod = 2;
+            this.fireCounter = 0;
+            this.isDestroyed = false;
+            this.destructionPause = 5*7*3  + 1;
+            this.powerupCounter = 0;
+            this.hasPowerup = 0;
+            this.destructionCounter = this.destructionPause;
+        }
+
+        public void draw(Graphics g, ImageObserver obs) {
+            //Check to see if player is destroyed or waiting to respawn
+            if(this.destructionCounter >= this.destructionPause && !isDestroyed)
+                g.drawImage(img, x, y, obs);
+            else
+            {
+                //If player waiting to respawn then play the destruction noice a number of times
+                if(this.destructionCounter % (7*3)  == 0)
+                    ((Tank)this.workingApplet).playSound("Resources/snd_explosion2.wav");
+                this.destructionCounter++;
+            }
+            
+            //Protects against the same event causing multiple explosions
+            if(explosionCounter == boomTime){
+                boom = 0;
+                explosionCounter = 0;
+            } else explosionCounter++;
+            
+            this.fireCounter++;
+            this.obs = obs; 
+            
+        }
+
+    public int getBulletSpeed() {
+        return bulletSpeed;
+    }
+    
+    
+
+    public boolean isDestroyed() {
+        return isDestroyed;
+    }
+    
+
+    public void setBulletSpeed(int bulletSpeed) {
+        this.bulletSpeed = bulletSpeed;
+    }
+
+    public void setDestructionPause(int destructionPause) {
+        this.destructionPause = destructionPause;
+    }
+    
+    public boolean collision(int x, int y, int w, int h) {
+
+        if ((y + h > this.y) && (y < this.y + img.getHeight(this.obs))) {
+            if ((x + w > this.x) && (x < this.x + img.getWidth(this.obs))) {
+                return true;
+            }
+        }
+        return false;
+    }
+        
+        public void tick()
+        {
+            if(health <= 0) this.blowUp();
+            
+            //Keep player inside play area
+            if((x + speed*movingX) < this.workingApplet.getWidth()-(this.img.getWidth(null)-10) && (x + speed*movingX) > -10 &&
+                   (y + speed*movingY) < this.workingApplet.getHeight()-(this.img.getHeight(null)-15) && (y + speed*movingY) > -15)
+            {
+                x += speed*movingX;
+                y += speed*movingY;
+            }
+        }
+      
+        public void update(Observable obj, Object arg)
+        {
+            GameEvents ge = (GameEvents) arg;
+            if(ge.type == 1) {
+                KeyEvent e = (KeyEvent) ge.event;
+                
+                if(e.getKeyCode() == this.motionKeys.getLeft())
+                    movingX = -1;
+                else if(e.getKeyCode() == this.motionKeys.getRight())
+                    movingX = +1;
+                else if(e.getKeyCode() == this.motionKeys.getUp())
+                    movingY = -1;
+                else if(e.getKeyCode() == this.motionKeys.getDown())
+                    movingY = +1;
+                
+                if(e.getKeyChar() == this.fireKey)
+                {
+                    //Check to see if the player has tried to fire to recently
+                    if(this.fireCounter > this.fireRefractoryPeriod)
+                    {
+                        //Check if the player is currently power uped
+                        if(this.powerupCounter > 0)
+                        {
+                            //Generate bullets going at 45 degree angles
+                            double speedComponent = Math.sqrt(2.0)/2.0;
+                            
+                            /*
+                            ((Tank)this.workingApplet).addShell(this.x+(this.img.getWidth(null)/4), this.y-8, 0, this.bulletSpeed, 2);
+                            ((Tank)this.workingApplet).addShell(this.x+(this.img.getWidth(null)/4)-12, this.y-12, 
+                                    (int)Math.round(speedComponent*((double)this.bulletSpeed)), (int)Math.round(speedComponent*((double)this.bulletSpeed)), 2, 135);
+                            ((Tank)this.workingApplet).addShell(this.x+(this.img.getWidth(null)/4)-5, this.y-16, 
+                                    -(int)Math.round(speedComponent*((double)this.bulletSpeed)), (int)Math.round(speedComponent*((double)this.bulletSpeed)), 2, 45);
+                            */
+                            powerupCounter--;
+                        }
+                        else
+                        {
+                            this.hasPowerup = 0;
+                            //((Tank)this.workingApplet).addShell(this.x+(this.img.getWidth(null)/4), this.y-8, 0, this.bulletSpeed, 2);  
+                        }
+                        
+                        this.fireCounter = 0;
+                    }
+                }
+
+            }
+            else if(ge.type == 2) {
+                String msg = (String)ge.event;
+                
+                if(msg.equals("EnemyCollision "+this.index)) {
+                    if(boom == 0) 
+                    {
+                        if(!Enemy.class.isInstance(ge.cause) || ge.cause == null)
+                            System.out.println("Error: inside player.update(), gameEvent.cause does not exist or is not an enemy");
+                        else
+                        {
+                            int explosionX = ((Enemy)ge.cause).getX();
+                            int explosionY = ((Enemy)ge.cause).getY();
+                            
+                            health -= ((Tank)this.workingApplet).damageFromRamming;
+                            
+                            this.boomTime = 5*7*1  + 1;
+                            ((Tank)this.workingApplet).addExplosion(new Explosion(this.workingApplet, explosionX, explosionY, 2, 5, 7, 1));
+                            ((Tank)this.workingApplet).playSound("Resources/snd_explosion2.wav");
+                        }
+                    }
+                    boom = 1;
+                }
+                
+                //Contact with an enemy bullet
+                if(msg.equals("ExplosionSmall "+this.index))
+                {
+                    if(ge.cause.getClass() != Bullet.class || ge.cause == null)
+                        System.out.println("Error: inside player.update(), gameEvent.cause does not exist or is not a bullet.");
+                    else
+                    {
+                        //The idea here is to make it look like the explosion is occuring right where the contact between the bullet and plane is.
+                        int explosionX = ((Bullet)ge.cause).getX() + (Bullet.smallImg.getWidth(null)/4);
+                        int explosionY = ((Bullet)ge.cause).getY() + (Bullet.smallImg.getWidth(null)/2)+this.img.getHeight(null)/10;
+                        this.health -= Bullet.bulletStrengthArray.get(0);
+
+                        ((Tank)this.workingApplet).addExplosion(new Explosion(this.workingApplet, explosionX, explosionY, 1, 5, 6, 1));
+                        ((Tank)this.workingApplet).playSound("Resources/snd_explosion1.wav");
+                    }
+                } 
+                
+                if(msg.equals("Powerup " + this.index))
+                {
+                    if(this.hasPowerup == 0)
+                    {
+                        if(ge.cause.getClass() != Powerup.class || ge.cause == null)
+                            System.out.println("Error: inside player.update(), gameEvent.cause does not exist or is not a powerup.");
+                        else
+                        {
+                            this.hasPowerup = 1;
+                            if(powerupCounter > 0)
+                                this.powerupCounter += ((Powerup)ge.cause).getPowerupDuration();
+                            else
+                                this.powerupCounter = ((Powerup)ge.cause).getPowerupDuration();
+                        }
+                    }
+                }
+            }
+            
+            //Key was released
+            else if(ge.type == 3)
+            {
+                KeyEvent e = (KeyEvent) ge.event;
+                if (e.getKeyCode() == this.motionKeys.getLeft() || e.getKeyCode() == this.motionKeys.getRight()) 
+                    movingX = 0;
+                if (e.getKeyCode() == this.motionKeys.getUp() || e.getKeyCode() == this.motionKeys.getDown()) 
+                    movingY = 0;
+            }
+        }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setFireRefractoryPeriod(int fireRefractoryPeriod) {
+        this.fireRefractoryPeriod = fireRefractoryPeriod;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+    
+    
+    
+    private void blowUp()
+    {
+        if(this.lives > 0)
+        {
+            this.lives--;
+            this.health = 100;
+            this.destructionCounter = 0;
+            this.boomTime = 5*7*3  + 1;
+            this.boom = 1;
+            ((Tank)this.workingApplet).addExplosion(new Explosion(this.workingApplet, this.x, this.y, 2, 5, 7, 3));
+            this.x = this.spawnX;
+            this.y = this.spawnY;     
+                        
+        }
+        else
+            isDestroyed = true;
+    }
+    
+    
+    
+    
+    
+    public void setVelocity(int xStep, int yStep)
+    {
+        this.movingX = xStep;
+        this.movingY = yStep;
+    }
+
+    public Image getImg() {
+        return img;
+    }
+
+    public ImageObserver getObs() {
+        return obs;
+    }
+        
+}
+
+
+public class SheildPowerup extends Powerup
+{
+    //private int powerupCounter;
+    private String color;
+    private static Image redSheildImage;
+    private static Image blueSheildImage;
+    private static Image sheildIconImage;
+    private static int imagePosition;
+    private static int imageIndexBound;
+    private static int fluxTime;
+    private int fluxCounter;
+    
+    
+    //", Sheild,"
+    public SheildPowerup(int x, int y, int speed, int powerupDuration, Controler control, String type) 
+    {
+        super(sheildIconImage, x, y, speed, powerupDuration, control, type);
+        fluxCounter = fluxTime;
+        this.sizeX = imageIndexBound;
+        //powerupCounter = 0;
+    }
+    
+    public static void setFluxTime(int fluxTime) {
+        SheildPowerup.fluxTime = fluxTime;
+    }
+
+    public static void setImageIndexBound(int imageIndexBound) {
+        SheildPowerup.imageIndexBound = imageIndexBound;
+    }
+
+    public static void setImagePosition(int imagePosition) {
+        SheildPowerup.imagePosition = imagePosition;
+    }
+
+
+    @Override
+    protected void collected() {
+        this.fluxCounter = 0;
+        this.playSound("Resources/Click.wav");
+    }
+
+    @Override
+    public void draw(Graphics g, ImageObserver obs) {
+        if (show) {
+            if (!isInFlux()) {
+                g.drawImage(((ToolkitImage) img).getBufferedImage().getSubimage(imageIndexBound * imagePosition, 0, imageIndexBound, imageIndexBound), x, y, obs);
+            } else {
+                fluxCounter++;
+            }
+        }
+    }
+
+    public void draw(Graphics g, ImageObserver obs, int x, int y) {
+        g.drawImage(((ToolkitImage) img).getBufferedImage().getSubimage(imageIndexBound * imagePosition, 0, imageIndexBound, imageIndexBound), x, y, obs);
+    }
+
+    protected boolean isCollectable() {
+        return this.show && !isInFlux();
+    }
+
+    public boolean isInFlux() {
+        return fluxCounter < fluxTime;
+    }
+
+    protected void playSound(String filename) {
+        try {
+            AudioPlayer.player.start(new AudioStream(getClass().getResourceAsStream(filename)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setControl(Controler control) {
+        this.control = control;
+    }
+    
+    public void drawOnTank(Graphics g, ImageObserver obs, String color, int x, int y)
+    {
+        if(color == "red")
+            g.drawImage(redSheildImage, x-8, y-8, obs);
+        
+        else
+            g.drawImage(blueSheildImage, x-8, y-8, obs);
+    }
+
+    public static void setRedSheildImage(Image redSheildImage) {
+        SheildPowerup.redSheildImage = redSheildImage;
+    }
+
+    public static void setBlueSheildImage(Image blueSheildImage) {
+        SheildPowerup.blueSheildImage = blueSheildImage;
+    }
+
+    public static void setSheildIconImage(Image sheildIconImage) {
+        SheildPowerup.sheildIconImage = sheildIconImage;
+    }
+
+}

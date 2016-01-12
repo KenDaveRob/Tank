@@ -1,0 +1,1 @@
+createHorizontalWall,1,0,0,80;createHorizontalWall,1,0,75,80;createverticalWall,1,1,0,75;createverticalWall,1,1,80,75

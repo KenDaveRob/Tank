@@ -1,0 +1,192 @@
+/*
+    public class Explosion extends Animation
+    {
+        private Image img;
+        private int explosionType;
+        private int x, y, height, width;
+        private int counter, rate, frameMax;
+        private boolean show;
+        
+        
+        public Explosion(int x, int y, String animationName, int rate) 
+        {
+            super.animationName = "explosion" + Integer.toString(explosionType);  
+            this.x = x;
+            this.y = y;
+            this.rate = rate;
+            this.counter = 0;
+            this.show = true;
+            setImage(1);
+
+        }
+
+        public Explosion(int x, int y, int explosionType, int rate) 
+        {
+            this.explosionType = explosionType;  
+            this.x = x;
+            this.y = y;
+            this.rate = rate;
+            this.counter = 0;
+            this.show = true;
+            setImage(1);
+        }
+        
+        private void setImage(int frame)
+        {
+            String frameName = "Resources/explosion" + Integer.toString(explosionType) + "_" + Integer.toString(frame) + ".png";
+            this.img = getSprite(frameName);
+            width = img.getWidth(null);
+            height = img.getHeight(null);
+        }
+    }*/
+
+public class Animation
+    {
+        protected Image img;
+        protected int x, y, height, width;
+        protected int counter, rate, frameMax;
+        protected boolean show;
+        protected String animationName;
+
+        public Animation(int x, int y, String animationName, int rate, int frameMax) 
+        {
+            this.animationName = animationName;  
+            this.x = x;
+            this.y = y;
+            this.rate = rate;
+            this.frameMax = frameMax;
+            this.counter = 0;
+            this.show = true;
+            setImage(1);
+
+        }
+        
+        public void incrementAnimation()
+        {
+            counter++;
+            
+            if(counter % rate == 0)
+            {
+                if((counter / rate)+1 <= frameMax)
+                {
+                    try
+                    {
+                        setImage((counter / rate)+1);
+                    }
+                    catch(Exception e)
+                    {
+                        System.err.println("Exception trying to setImage() in incrementAnimation(), e = "+e.toString());
+                    }
+                }
+                
+                else show = false;
+                    
+            }
+        }
+        
+        private void setImage(int frame)
+        {
+            String frameName = "Resources/" + animationName + "_" + Integer.toString(frame) + ".png";
+            this.img = getSprite(frameName);
+            width = img.getWidth(null);
+            height = img.getHeight(null);
+        }
+        
+        public void draw(Graphics g, ImageObserver obs) {
+            if (show) {
+                g.drawImage(img, x, y, obs);
+            }
+        }
+    }
+
+public class Enemy {
+
+        Image img;
+        int x, y, sizeX, sizeY, speed;
+        Random gen;
+        boolean show;
+   
+        Enemy(int speed, Random gen) 
+        {
+            this.img = getSprite("Resources/enemy1_1.png");
+            this.x = Math.abs(gen.nextInt() % (600 - 30));
+            this.y = -100;
+            this.speed = speed;
+            this.gen = gen;
+            this.show = true;
+            sizeX = img.getWidth(null);
+            sizeY = img.getHeight(null);
+            System.out.println("w:" + sizeX + " y:" + sizeY);
+       }
+
+        public Enemy(int x, int y) {
+            this.img = getSprite("Resources/enemy1_1.png");
+            this.x = x;
+            this.y = y;
+            this.speed = 1;
+            this.show = true;
+            sizeX = img.getWidth(null);
+            sizeY = img.getHeight(null);
+        }
+
+        public void update(int w, int h) {
+            y += speed;
+            if(m.collision(x, y, sizeX, sizeY)) {
+                show = false;
+                //System.out.println("Explosion");
+                gameEvents.setValue("Explosion");
+            }
+        }
+
+        public void draw(Graphics g, ImageObserver obs) {
+            if (show) {
+                g.drawImage(img, x, y, obs);
+            }
+        }
+    }
+
+public class Enemy {
+
+        Image img;
+        int x, y, sizeX, sizeY, speed;
+        Random gen;
+        boolean show;
+        protected JavaApplication6 workingApplet;
+   
+        Enemy(JavaApplication6 workingApplet, int speed, Random gen) {
+            this.img = workingApplet.getSprite("Resources/enemy1_1.png");
+            this.x = Math.abs(gen.nextInt() % (600 - 30));
+            this.y = -100;
+            this.speed = speed;
+            this.gen = gen;
+            this.show = true;
+            sizeX = img.getWidth(null);
+            sizeY = img.getHeight(null);
+            System.out.println("w:" + sizeX + " y:" + sizeY);
+       }
+
+        public Enemy(JavaApplication6 workingApplet, int x, int y) {
+            this.img = workingApplet.getSprite("Resources/enemy1_1.png");
+            this.x = x;
+            this.y = y;
+            this.speed = 1;
+            this.show = true;
+            sizeX = img.getWidth(null);
+            sizeY = img.getHeight(null);
+        }
+
+        public void update(int w, int h) {
+            y += speed;
+            if(workingApplet.m.collision(x, y, sizeX, sizeY)) {
+                show = false;
+                //System.out.println("Explosion");
+                workingApplet.gameEvents.setValue("Explosion");
+            }
+        }
+
+        public void draw(Graphics g, ImageObserver obs) {
+            if (show) {
+                g.drawImage(img, x, y, obs);
+            }
+        }
+    }
